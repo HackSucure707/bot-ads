@@ -35,26 +35,28 @@ async def get_groups():
     return chats
 
 async def send_ad_to_groups():
-    await client.start(phone)
-    if not await client.is_user_authorized():
-        await client.send_code_request(phone)
-        await client.sign_in(phone, input('Enter the code: '))
-
-    groups = await get_groups()
-    for group in groups:
-        try:
-            await client.send_message(group, ad_message)
-            print(f"Message sent to {group.title}")
-        except PeerFloodError:
-            print("Getting Flood Error from Telegram. Script is stopping now.")
-            print("Please try again after some time.")
-            break
-        except UserPrivacyRestrictedError:
-            print(f"User privacy restricted for {group.title}. Skipping.")
-            continue
-        except Exception as e:
-            print(f"Error sending message to {group.title}: {e}")
-            continue
+    try:
+        await client.start(phone)
+        if not await client.is_user_authorized():
+            await client.send_code_request(phone)
+            await client.sign_in(phone, '12345')  # Enter the code: 12345
+        groups = await get_groups()
+        for group in groups:
+            try:
+                await client.send_message(group, ad_message)
+                print(f"Message sent to {group.title}")
+            except PeerFloodError:
+                print("Getting Flood Error from Telegram. Script is stopping now.")
+                print("Please try again after some time.")
+                break
+            except UserPrivacyRestrictedError:
+                print(f"User privacy restricted for {group.title}. Skipping.")
+                continue
+            except Exception as e:
+                print(f"Error sending message to {group.title}: {e}")
+                continue
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
 
 async def main():
     while True:
